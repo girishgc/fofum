@@ -12,20 +12,22 @@ listen on events fire events.
 """
 
 PHANTOM_PATH = '/usr/bin/phantomjs'
-FEEFIE_SERVER_URL = "http://www.feefie.com/command"
+#FEEFIE_SERVER_URL = "http://www.feefie.com/command"
+FEEFIE_SERVER_URL = "http://feefie980522.appspot.com/command"
 
 CHANNEL_JS="""
         var page = require('webpage').create();
         page.open('%s?action=subscribe&hash=%s&html=1',function() {
-        setTimeout(function() {
+        loopfn = function() {
             var title = page.evaluate(function () {
-                return eCount;
+                return eCount+'###'+payload.data;
             });
-            console.log(eCount+'###'+payload);
-            phantom.exit();
-        },1000
-        );
+            console.log(title);
+            setTimeout(loopfn,1000);
+        };
+        setTimeout(loopfn,1000);
         });
+        
 """
 
 class FofumException(Exception):
@@ -86,11 +88,9 @@ class Fofum:
         
         while True:
             msg = conn.readline()
-            print 'Msg = %s'%msg
             if ('###' in msg):
                 status,payload = msg.split('###')
-                print "Status=%s,Msg=%s"%(status,payload)
-                status = int(msg[1:])
+                status = int(status)
                 if (status>self.series):
                     self.series = status
                     if (self.callback):
