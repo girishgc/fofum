@@ -12,8 +12,8 @@ listen on events fire events.
 """
 
 PHANTOM_PATH = '/usr/bin/phantomjs'
-#FEEFIE_SERVER_URL = "http://www.feefie.com/command"
-FEEFIE_SERVER_URL = "http://feefie980522.appspot.com/command"
+FEEFIE_SERVER_URL = "http://www.feefie.com/command"
+#FEEFIE_SERVER_URL = "http://feefie980522.appspot.com/command"
 
 CHANNEL_JS="""
         var page = require('webpage').create();
@@ -70,10 +70,9 @@ class Fofum:
                 except KeyError:
                     raise FofumException('Error fetching token. Did not get token spec')
         except:
-            raise FofumException('Error subscribing to event. Malformed response.')
+            raise FofumException('Error subscribing to event. Malformed response %s'%ret_string.text)
 
-    def fire(self, payload):
-        print 'Firing %s'%self.hash
+    def fire(self, payload='""'):
         self.run_action('fire',hash=self.hash,message=payload)
 
     def listen(self):
@@ -81,7 +80,6 @@ class Fofum:
         f = tempfile.NamedTemporaryFile('w')
         f.write(channel_js)
         f.flush()
-        print "Hash = %s"%self.hash
         cmdline = '%s %s'%(PHANTOM_PATH, f.name)
         conn = os.popen(cmdline)
         self.series = 0
@@ -101,7 +99,7 @@ class Fofum:
         return    
 
     # This method creates/looks up an event, subscribes to it, listens and reconnects if necessary.
-    def listen_on_event(self, event_name, callback):
+    def listen_for_event(self, event_name, callback):
         self.callback = callback
         hash = self.make(event_name)
 
@@ -115,7 +113,7 @@ class Fofum:
                 time.sleep(5.0 - interval)
                 
 
-    def __init__(self,user=''):
+    def __init__(self,user='',hash=None):
         # Check phantomjs dependency
         if (not os.access(PHANTOM_PATH,0)):
             raise FofumException('Phantomjs not installed.')
