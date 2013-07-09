@@ -44,7 +44,7 @@ class Fofum:
         params = {'action':action,'hash':hash,'payload':message,'u':self.user,'event':event}
         return requests.get(FEEFIE_SERVER_URL, params=params)
 
-    def make(self, title, client_id=''):
+    def make(self, title):
         self.client_id = client_id
         ret_string = self.run_action('add',title=title)
         try:
@@ -68,6 +68,7 @@ class Fofum:
             else:
                 try:
                     self.token = ret_dict['token']
+                    self.client_id = ret_dict['client_id']
                 except KeyError:
                     raise FofumException('Error fetching token. Did not get token spec')
         except:
@@ -114,7 +115,8 @@ class Fofum:
                 time.sleep(5.0 - interval)
                 
 
-    def __init__(self,user='',hash=None):
+    def __init__(self,user='',hash=None,client_id=''):
+
         # Check phantomjs dependency
         if (not os.access(PHANTOM_PATH,0)):
             raise FofumException('Phantomjs not installed.')
