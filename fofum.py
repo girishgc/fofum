@@ -11,7 +11,7 @@ listen on events fire events.
 
 """
 
-PHANTOM_PATH = '/usr/bin/phantomjs'
+PHANTOM_PATH = '/bin/phantomjs'
 FEEFIE_SERVER_URL = "http://www.feefie.com/command"
 #FEEFIE_SERVER_URL = "http://feefie980522.appspot.com/command"
 
@@ -39,12 +39,13 @@ class FofumException(Exception):
         
 
 class Fofum:
-    def run_action(self, action, hash='', message='',title=''):
+    def run_action(self, action, hash='', message='',title='',client_id=''):
         event = json.dumps({'title':title})
         params = {'action':action,'hash':hash,'payload':message,'u':self.user,'event':event}
         return requests.get(FEEFIE_SERVER_URL, params=params)
 
-    def make(self, title):
+    def make(self, title, client_id=''):
+        self.client_id = client_id
         ret_string = self.run_action('add',title=title)
         try:
             ret_dict = json.loads(ret_string.text)
@@ -59,7 +60,7 @@ class Fofum:
             raise FofumException('Error creating event. Malformed response: %s'%ret_string.text)
 
     def subscribe(self):
-        ret_string = self.run_action('subscribe', hash=self.hash)
+        ret_string = self.run_action('subscribe', hash=self.hash, client_id=self.client_id)
         try:
             ret_dict = json.loads(ret_string.text)
             if (ret_dict['status']!=0):
