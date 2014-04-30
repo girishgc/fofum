@@ -42,7 +42,7 @@ class Fofum:
     _client_id=''
     def run_action(self, action, hash='', message='',title=''):
         event = json.dumps({'title':title})
-        params = {'action':action,'hash':hash,'payload':message,'u':self.user,'event':event,'client_id'=_client_id}
+        params = {'action':action,'hash':hash,'payload':message,'u':self.user,'event':event,'client_id':_client_id}
         return requests.get(FEEFIE_SERVER_URL, params=params)
 
     def make(self, title):
