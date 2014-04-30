@@ -98,6 +98,12 @@ class Fofum:
                 elif (status<0):
                     break
         # Returns when connection breaks. Caller needs to resubscribe, relisten
+        try:
+            conn.close()
+        except Exception,e:
+            print "Could not terminate phantomjs. This may cause a memory leak."
+            print str(e)
+
         return    
 
     # This method creates/looks up an event, subscribes to it, listens and reconnects if necessary.
