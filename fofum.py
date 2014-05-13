@@ -27,7 +27,7 @@ CHANNEL_JS="""
         };
         setTimeout(loopfn,1000);
         });
-        
+
 """
 
 class FofumException(Exception):
@@ -36,13 +36,16 @@ class FofumException(Exception):
 
     def __str__(self):
         return str(self.value)
-        
+
 
 class Fofum:
+    # Use _client_id as a class variable. It will be shared by all Fofum
+    # objects in this python interpreter process.
     _client_id=''
+
     def run_action(self, action, hash='', message='',title=''):
         event = json.dumps({'title':title})
-        params = {'action':action,'hash':hash,'payload':message,'u':self.user,'event':event,'client_id':_client_id}
+        params = {'action':action,'hash':hash,'payload':message,'u':self.user,'event':event,'client_id':Fofum._client_id}
         return requests.get(FEEFIE_SERVER_URL, params=params)
 
     def make(self, title):
@@ -68,7 +71,7 @@ class Fofum:
             else:
                 try:
                     self.token = ret_dict['token']
-                    _client_id = ret_dict['client_id']
+                    Fofum._client_id = ret_dict['client_id']
                 except KeyError:
                     raise FofumException('Error fetching token. Did not get token spec')
         except:
@@ -122,7 +125,7 @@ class Fofum:
                 
 
     def __init__(self,user='',hash=None,client_id=''):
-        _client_id = client_id
+        Fofum._client_id = client_id
         # Check phantomjs dependency
         if (not os.access(PHANTOM_PATH,0)):
             raise FofumException('Phantomjs not installed.')
